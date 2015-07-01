@@ -2,7 +2,7 @@ require "simplify_rb/version"
 
 class SimplifyRb
   # Main method
-  def self.simplify (points, tolerance=1, highest_quality=false)
+  def self.simplify (points, tolerance=1, highest_quality=false, max_points = nil)
     raise ArgumentError.new('Points must be an array') unless points.is_a? Array
 
     return points if points.length <= 1
@@ -15,7 +15,7 @@ class SimplifyRb
     points = simplifyRadialDist(points, sq_tolerance) unless highest_quality
 
     # Optimisation step 2
-    simplifyDouglasPeucker(points, sq_tolerance)
+    simplifyDouglasPeucker(points, sq_tolerance, max_points)
   end
 
   # Basic distance-based simplification
@@ -32,7 +32,7 @@ class SimplifyRb
   end
 
   # Simplification using optimized Douglas-Peucker algorithm with recursion elimination
-  def self.simplifyDouglasPeucker (points, sq_tolerance)
+  def self.simplifyDouglasPeucker (points, sq_tolerance, max_points)
     first = 0
     last  = points.length - 1
     index = nil
@@ -40,8 +40,9 @@ class SimplifyRb
 
     points.first[:keep] = true
     points.last[:keep]  = true
+    points_marked = 2
 
-    while last do
+    while last && (!max_points || points_marked < max_points) do
       max_sq_dist = 0
 
       ((first + 1)...last).each do |i|
@@ -55,6 +56,7 @@ class SimplifyRb
 
       if max_sq_dist > sq_tolerance
         points[index][:keep] = true
+        points_marked += 1
 
         stack.push(first, index, index, last)
       end
