@@ -13,6 +13,29 @@ describe SimplifyRb do
     end
   end
 
+  context "simplifies points correctly with given tolerance and maximum limit" do
+    # (0,0), (5,1), (7,2), (6,4), (4,7),(3,8), (8,9), (10,10)
+    # (0,0), (7,2), (3,8), (10,10)
+    let(:test_data) do
+      [
+        {x: 0.0, y: 0.0},
+        {x: 5.0, y: 1.0},
+        {x: 7.0, y: 2.0},
+        {x: 6.0, y: 4.0},
+        {x: 4.0, y: 7.0},
+        {x: 3.0, y: 8.0},
+        {x: 8.0, y: 9.0},
+        {x: 10.0, y: 10.0}
+      ]
+    end
+
+    let(:four_point_result) { [{x: 0, y: 0}, {x: 7, y: 2}, {x: 3, y: 8}, {x: 10, y: 10}] }
+
+    it "stops iterating after 'keeping' the maximum number of points" do
+      expect(SimplifyRb.simplify(test_data, 0.01, true, 4)).to eq(four_point_result)
+    end
+  end
+
   it "returns the points if it has only one point" do
     data = [{x: 1, y: 2}]
 

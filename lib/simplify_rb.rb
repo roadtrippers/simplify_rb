@@ -58,10 +58,14 @@ class SimplifyRb
         points[index][:keep] = true
         points_marked += 1
 
-        stack.push(first, index, index, last)
+        if (index - first) >= (last - index)
+          stack.push(first, index, index, last)
+        else
+          stack.push(index, last, first, index)
+        end
       end
 
-      first, last = stack.pop(2)
+      first, last = stack.shift(2)
     end # end while
 
     points.select { |p| p[:keep] && p.delete(:keep) }
